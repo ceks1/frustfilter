@@ -1,1 +1,384 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Filter — Profesionalni prevodilac emocija</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F7F5F2;
+  --surface: #FFFFFF;
+  --surface2: #F0EDE8;
+  --border: #E2DDD8;
+  --text: #1A1714;
+  --muted: #8A847D;
+  --accent: #2C5F2E;
+  --accent-light: #EAF0EA;
+  --accent2: #C8452A;
+  --accent2-light: #FBF0EE;
+  --warn: #B07A1A;
+  --warn-light: #FDF6E7;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; font-size: 15px; line-height: 1.6; min-height: 100vh; }
+nav { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 2.5rem; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
+.logo { font-family: 'DM Serif Display', serif; font-size: 1.4rem; letter-spacing: -0.5px; }
+.logo span { color: var(--accent); }
+.nav-tag { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); background: var(--surface2); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); }
+.hero { padding: 3.5rem 2.5rem 2rem; max-width: 860px; margin: 0 auto; }
+.hero-eyebrow { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; }
+.hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.15; letter-spacing: -1px; margin-bottom: 0.75rem; }
+.hero h1 em { font-style: italic; color: var(--accent); }
+.hero-sub { font-size: 0.95rem; color: var(--muted); max-width: 480px; line-height: 1.7; }
+.main { max-width: 860px; margin: 0 auto; padding: 0 2.5rem 5rem; display: grid; gap: 1.25rem; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; }
+.card-label { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 2.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 6px; }
+.card-label::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent2); }
+textarea { width: 100%; border: 1px solid var(--border); border-radius: 10px; background: var(--surface2); color: var(--text); font-family: 'Outfit', sans-serif; font-size: 1rem; line-height: 1.7; padding: 1rem 1.25rem; resize: vertical; min-height: 110px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(44,95,46,0.08); background: var(--surface); }
+textarea::placeholder { color: #BAB5AE; }
+.emotion-bar { display: flex; align-items: center; gap: 10px; padding: 9px 14px; border-radius: 8px; font-size: 0.8rem; margin-top: 0.75rem; transition: all 0.3s; background: var(--surface2); border: 1px solid var(--border); color: var(--muted); }
+.emotion-bar.frustration { background: var(--accent2-light); border-color: #F0BDB4; color: var(--accent2); }
+.emotion-bar.exhaustion { background: var(--warn-light); border-color: #F0DBA8; color: var(--warn); }
+.emotion-bar.sarcasm { background: #F0EAF7; border-color: #D9C8EE; color: #6B3FA0; }
+.emotion-bar.passive { background: #EAF3FB; border-color: #B8D8F2; color: #1A5FA0; }
+.emotion-bar.calm { background: var(--accent-light); border-color: #C0D8C2; color: var(--accent); }
+.emotion-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: currentColor; }
+.type-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.type-btn { padding: 0.9rem 0.5rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface2); cursor: pointer; text-align: center; transition: all 0.15s; }
+.type-btn:hover { border-color: var(--accent); background: var(--accent-light); }
+.type-btn.active { border-color: var(--accent); background: var(--accent-light); box-shadow: 0 0 0 2px rgba(44,95,46,0.15); }
+.type-icon { font-size: 1.1rem; margin-bottom: 4px; }
+.type-name { font-size: 0.8rem; font-weight: 600; color: var(--text); display: block; }
+.type-desc { font-size: 0.68rem; color: var(--muted); display: block; margin-top: 2px; }
+.divider { height: 1px; background: var(--border); margin: 1.25rem 0; }
+.tone-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.tone-chip { padding: 6px 14px; border: 1px solid var(--border); border-radius: 20px; font-size: 0.78rem; cursor: pointer; background: var(--surface2); transition: all 0.15s; font-family: 'Outfit', sans-serif; }
+.tone-chip:hover { border-color: var(--accent); color: var(--accent); }
+.tone-chip.active { background: var(--accent); border-color: var(--accent); color: white; }
+.btn-generate { width: 100%; padding: 1rem; background: var(--accent); color: white; border: none; border-radius: 10px; font-family: 'Outfit', sans-serif; font-size: 1rem; font-weight: 500; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.btn-generate:hover { background: #224B24; transform: translateY(-1px); }
+.btn-generate:active { transform: translateY(0); }
+.result-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; display: none; animation: slideIn 0.3s ease; }
+@keyframes slideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+.result-header { padding: 1rem 1.5rem; background: var(--accent-light); border-bottom: 1px solid #C8DEC9; display: flex; align-items: center; justify-content: space-between; }
+.result-tag { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
+.result-actions { display: flex; gap: 6px; }
+.btn-small { padding: 5px 12px; border: 1px solid #C8DEC9; border-radius: 6px; background: transparent; cursor: pointer; font-size: 0.75rem; font-family: 'Outfit', sans-serif; color: var(--accent); transition: all 0.15s; }
+.btn-small:hover { background: white; border-color: var(--accent); }
+.btn-small.copied { background: var(--accent); color: white; border-color: var(--accent); }
+.result-body { padding: 1.5rem; font-size: 0.95rem; line-height: 1.85; color: var(--text); white-space: pre-wrap; }
+footer { text-align: center; padding: 2rem; font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); border-top: 1px solid var(--border); margin-top: 2rem; }
+@media (max-width: 600px) {
+  nav { padding: 1rem 1.25rem; }
+  .hero { padding: 2rem 1.25rem 1.5rem; }
+  .main { padding: 0 1.25rem 4rem; }
+  .card { padding: 1.25rem; }
+  .type-grid { grid-template-columns: 1fr 1fr 1fr; }
+}
+</style>
+</head>
+<body>
 
+<nav>
+  <div class="logo">Fil<span>ter</span></div>
+  <div class="nav-tag">Prevodilac emocija</div>
+</nav>
+
+<div class="hero">
+  <div class="hero-eyebrow">// Alat za radni dan</div>
+  <h1>Frustracija unutra,<br><em>profesionalnost</em> napolje.</h1>
+  <p class="hero-sub">Upiši šta stvarno misliš — Filter pretvara to u poruku kojom možeš biti ponosan.</p>
+</div>
+
+<div class="main">
+
+  <div class="card">
+    <div class="card-label">Tvoja interna misao</div>
+    <textarea id="ulaz" placeholder="npr. javljaju se svaki sat, opet iste gluposti, umoran sam, ne znam šta još da im kažem..." oninput="onInput()"></textarea>
+    <div class="emotion-bar" id="emotion-bar">
+      <div class="emotion-dot"></div>
+      <span id="emotion-text">Unesi tekst — detektujem emociju...</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Tip odgovora</div>
+    <div class="type-grid" id="type-grid">
+      <div class="type-btn active" data-type="potvrda" onclick="selectType(this)">
+        <div class="type-icon">✅</div>
+        <span class="type-name">Potvrda prijema</span>
+        <span class="type-desc">Primili smo, radimo na tome</span>
+      </div>
+      <div class="type-btn" data-type="odlaganje" onclick="selectType(this)">
+        <div class="type-icon">🕐</div>
+        <span class="type-name">Odlaganje roka</span>
+        <span class="type-desc">Treba nam više vremena</span>
+      </div>
+      <div class="type-btn" data-type="odbijanje" onclick="selectType(this)">
+        <div class="type-icon">🚫</div>
+        <span class="type-name">Ljubazno odbijanje</span>
+        <span class="type-desc">Ne možemo ispuniti zahtev</span>
+      </div>
+      <div class="type-btn" data-type="objasnjenje" onclick="selectType(this)">
+        <div class="type-icon">📋</div>
+        <span class="type-name">Objašnjenje</span>
+        <span class="type-desc">Edukativno, strpljivo</span>
+      </div>
+      <div class="type-btn" data-type="eskalacija" onclick="selectType(this)">
+        <div class="type-icon">📞</div>
+        <span class="type-name">Eskalacija</span>
+        <span class="type-desc">Prosledi nadređenom</span>
+      </div>
+      <div class="type-btn" data-type="zahvalnost" onclick="selectType(this)">
+        <div class="type-icon">🤝</div>
+        <span class="type-name">Zahvalnost</span>
+        <span class="type-desc">Ceniš strpljenje klijenta</span>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="card-label">Ton poruke</div>
+    <div class="tone-row">
+      <div class="tone-chip active" data-tone="formalno" onclick="selectTone(this)">Formalno</div>
+      <div class="tone-chip" data-tone="prijatno" onclick="selectTone(this)">Prijatno i toplo</div>
+      <div class="tone-chip" data-tone="kratko" onclick="selectTone(this)">Kratko i jasno</div>
+      <div class="tone-chip" data-tone="strpljivo" onclick="selectTone(this)">Strpljivo</div>
+    </div>
+  </div>
+
+  <button class="btn-generate" onclick="generiši()">↗ Pretvori u profesionalnu poruku</button>
+
+  <div class="result-card" id="result-card">
+    <div class="result-header">
+      <div class="result-tag">✓ Spremno za slanje</div>
+      <div class="result-actions">
+        <button class="btn-small" onclick="generiši()">↻ Nova verzija</button>
+        <button class="btn-small" id="btn-copy" onclick="kopiraj()">⎘ Kopiraj</button>
+      </div>
+    </div>
+    <div class="result-body" id="result-body"></div>
+  </div>
+
+</div>
+
+<footer>Filter · Prevodilac poslovnih emocija · 2026</footer>
+
+<script>
+// ─── EMOTION DETECTION ───────────────────────────────────────────────────────
+
+const EMOTIONS = [
+  { keys: ['glup','glupi','glupa','bezveze','ne razume','ne kapira','ne kapiraju','besmisleno','zar ne znaju','ko to pita'], label: '😤 Frustracija — detektovana', cls: 'frustration', tag: 'frustration' },
+  { keys: ['bes','besan','besna','ljut','ljuta','nerviram','ne mogu da verujem','neverovatno','stvarno ne','kakvi su'], label: '😠 Bes — detektovan', cls: 'frustration', tag: 'anger' },
+  { keys: ['umoran','umorna','ne mogu više','dosta','sit sam','sita sam','iscrpljen','iscrpljena','smaran','smaraju','smara me','javljaju svaki sat','po 10 puta','opet isti','ponovo isti','po stoti'], label: '😮‍💨 Iscrpljenost — detektovana', cls: 'exhaustion', tag: 'exhaustion' },
+  { keys: ['naravno','pa naravno','jasno','zašto bi','baš','jedini koji','uvek oni','samo oni'], label: '😏 Sarkazam — detektovan', cls: 'sarcasm', tag: 'sarcasm' },
+  { keys: ['ne znam','pojma nemam','šta da kažem','kako da','nisam siguran','nisam sigurna','šta da odgovorim'], label: '😶 Nesigurnost — detektovana', cls: 'passive', tag: 'unsure' },
+  { keys: ['kasni','zaostalo','nismo stigli','nemamo vremena','previše posla','preopterećeni','nema vremena'], label: '⏳ Pritisak — detektovan', cls: 'exhaustion', tag: 'pressure' },
+];
+
+let selectedType = 'potvrda';
+let selectedTone = 'formalno';
+let detectedEmotion = 'neutral';
+
+function onInput() {
+  const v = document.getElementById('ulaz').value.toLowerCase();
+  const bar = document.getElementById('emotion-bar');
+  const txt = document.getElementById('emotion-text');
+  bar.className = 'emotion-bar';
+  detectedEmotion = 'neutral';
+  if (!v.trim()) { txt.textContent = 'Unesi tekst — detektujem emociju...'; return; }
+  let found = null;
+  for (const e of EMOTIONS) {
+    if (e.keys.some(k => v.includes(k))) { found = e; break; }
+  }
+  if (found) {
+    bar.classList.add(found.cls);
+    txt.textContent = found.label;
+    detectedEmotion = found.tag;
+  } else {
+    bar.classList.add('calm');
+    txt.textContent = '🟢 Tekst prepoznat — spreman za prevođenje';
+  }
+}
+
+function selectType(el) {
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  selectedType = el.dataset.type;
+}
+
+function selectTone(el) {
+  document.querySelectorAll('.tone-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  selectedTone = el.dataset.tone;
+}
+
+// ─── TEMPLATE ENGINE ─────────────────────────────────────────────────────────
+// Each entry is [type][tone] = array of templates
+// {DETALJI} gets replaced with extracted details or a generic phrase
+
+const TEMPLATES = {
+
+  potvrda: {
+    formalno: [
+      "Poštovani,\n\nHvala Vam na Vašem obraćanju. Obaveštavamo Vas da smo primili Vaš zahtev i da je isti uzet u razmatranje.\n\nNaš tim će se posvetiti rešavanju u najkraćem mogućem roku. O napretku ćemo Vas blagovremeno obaveštavati.\n\nS poštovanjem",
+      "Poštovani,\n\nPotvrđujemo prijem Vašeg zahteva. Zahtev je evidentiran i proslеđen nadležnom timu na dalje postupanje.\n\nUkoliko budete imali dodatnih pitanja, slobodno nas kontaktirajte.\n\nS poštovanjem",
+    ],
+    prijatno: [
+      "Zdravo!\n\nHvala što ste nas kontaktirali — zahtev smo primili i već smo na tome. Dajemo sve od sebe da Vam što pre izađemo u susret.\n\nAko budete imali bilo kakvo pitanje u međuvremenu, tu smo.\n\nSrdačan pozdrav",
+      "Zdravo!\n\nPrimili smo Vaš zahtev i veseli smo što možemo da pomognemo. Tim je obavešten i radi na rešavanju. Čućete od nas uskoro!\n\nSrdačan pozdrav",
+    ],
+    kratko: [
+      "Poštovani,\n\nZahtev primljen. Radimo na tome i javićemo se čim budemo imali update.\n\nPozdrav",
+      "Poštovani,\n\nPotvrđujemo prijem. Tim je obavešten — očekujte odgovor uskoro.\n\nPozdrav",
+    ],
+    strpljivo: [
+      "Poštovani,\n\nHvala Vam na strpljenju. Vaš zahtev je primljen i pažljivo razmotren. Razumemo važnost brzog rešavanja, stoga smo se odmah posvetili ovom predmetu.\n\nBićemo u kontaktu čim imamo konkretne informacije za Vas.\n\nS poštovanjem",
+    ],
+  },
+
+  odlaganje: {
+    formalno: [
+      "Poštovani,\n\nU vezi sa Vašim zahtevom, obaveštavamo Vas da su nam potrebni dodatni vremenski resursi kako bismo Vam pružili potpun i precizan odgovor.\n\nOčekujte naš povratni kontakt u roku od [ROK]. Zahvaljujemo na razumevanju.\n\nS poštovanjem",
+      "Poštovani,\n\nObrađujemo Vaš zahtev i moramo Vas obavestiti da je za kvalitetno rešavanje potrebno nešto više vremena od uobičajenog.\n\nNajkasnije do [ROK] ćemo Vam dostaviti konkretan odgovor. Cenimo Vaše strpljenje.\n\nS poštovanjem",
+    ],
+    prijatno: [
+      "Zdravo!\n\nHvala na razumevanju — radimo marljivo na Vašem zahtevu, ali potrebno nam je još malo vremena kako bismo sve rešili kako treba.\n\nNajkasnije do [ROK] ćemo Vam se javiti sa odgovorom. Hvala što ste uz nas!\n\nSrdačan pozdrav",
+    ],
+    kratko: [
+      "Poštovani,\n\nZahtev je u obradi. Potrebno nam je nešto više vremena — javićemo se do [ROK].\n\nHvala na strpljenju.\n\nPozdrav",
+    ],
+    strpljivo: [
+      "Poštovani,\n\nHvala Vam na strpljenju i razumevanju. Svesni smo da čekanje može biti neprijatno, ali želimo da Vam pružimo kvalitetan i tačan odgovor — a to zahteva malo više vremena.\n\nObavezno ćemo Vas kontaktirati do [ROK]. Ukoliko u međuvremenu budete imali hitnih pitanja, slobodno nam se obratite.\n\nS poštovanjem",
+    ],
+  },
+
+  odbijanje: {
+    formalno: [
+      "Poštovani,\n\nHvala Vam na Vašem zahtevu. Nakon pažljivog razmatranja, moramo Vas obavestiti da u ovom trenutku nismo u mogućnosti da ga ispunimo, budući da prevazilazi okvir naših trenutnih kapaciteta i procedura.\n\nUkoliko postoji alternativno rešenje koje bi Vam odgovaralo, rado ćemo ga razmotriti. Stojimo Vam na raspolaganju.\n\nS poštovanjem",
+      "Poštovani,\n\nCenimo Vaše poverenje i razumemo Vaš zahtev. Međutim, sa žaljenjem Vas obaveštavamo da u ovom trenutku nismo u poziciji da odgovorimo na isti.\n\nSpremi smo da razgovaramo o mogućim alternativnim opcijama.\n\nS poštovanjem",
+    ],
+    prijatno: [
+      "Zdravo!\n\nHvala što ste se obratili — iskreno cenimo Vaše poverenje. Nažalost, ovog puta nismo u mogućnosti da ispunimo ovaj konkretan zahtev, ali to ne znači da ne možemo da pomognemo na drugi način.\n\nAko želite, razgovarajmo o alternativama — sigurni smo da ćemo naći nešto što Vam odgovara.\n\nSrdačan pozdrav",
+    ],
+    kratko: [
+      "Poštovani,\n\nNažalost, ovaj zahtev ne možemo ispuniti. Dostupni smo za razgovor o alternativnim rešenjima ukoliko Vas to zanima.\n\nPozdrav",
+    ],
+    strpljivo: [
+      "Poštovani,\n\nHvala Vam na razumevanju. Pažljivo smo razmotrili Vaš zahtev i sa žaljenjem moramo konstatovati da u ovom trenutku i u datim okvirima isti nije izvodljiv.\n\nRazumemo da ovo možda nije odgovor koji ste očekivali, i iskreno nam je žao zbog toga. Ukoliko postoji bilo koji drugi način na koji možemo da Vam pomognemo, u potpunosti smo Vam na raspolaganju.\n\nS poštovanjem",
+    ],
+  },
+
+  objasnjenje: {
+    formalno: [
+      "Poštovani,\n\nHvala na Vašem pitanju. Kako bismo otklonili eventualne nedoumice, u nastavku Vam pružamo detaljno pojašnjenje.\n\nNaš proces funkcioniše na sledeći način: svaki zahtev prolazi kroz standardnu proceduru obrade koja podrazumeva verifikaciju, analizu i implementaciju. Svaki korak zahteva određeno vreme kako bismo garantovali kvalitet.\n\nUkoliko imate dodatnih pitanja, slobodno nas kontaktirajte.\n\nS poštovanjem",
+      "Poštovani,\n\nRazumemo da je situacija možda nedovoljno jasna, te Vam u nastavku pružamo dodatna pojašnjenja.\n\nProces koji pratimo osmišljen je tako da obezbedi efikasnost i preciznost. Upravo zbog toga postoje određene faze kroz koje zahtev mora proći pre nego što bude realizovan.\n\nStojimo Vam na raspolaganju za sva dalja pitanja.\n\nS poštovanjem",
+    ],
+    prijatno: [
+      "Zdravo!\n\nOdlično pitanje — rado ćemo pojasniti! Ponekad naš proces može delovati komplikovanije nego što jeste, pa hajde da razjasnimo.\n\nSvaki zahtev koji primimo prolazi kroz nekoliko koraka kako bismo bili sigurni da je sve urađeno kako treba. To znači da ponekad treba malo više vremena, ali garantuje kvalitet.\n\nAko imate još pitanja, slobodno pitajte — tu smo!\n\nSrdačan pozdrav",
+    ],
+    kratko: [
+      "Poštovani,\n\nKratko pojašnjenje: naš standardni proces obrade zahteva podrazumeva nekoliko faza verifikacije i implementacije. Svaka faza je neophodna za kvalitetan ishod.\n\nZa detalje stojimo na raspolaganju.\n\nPozdrav",
+    ],
+    strpljivo: [
+      "Poštovani,\n\nHvala Vam na pitanju — sasvim je razumljivo što želite jasnije objašnjenje, i mi smo ovde upravo zbog toga.\n\nDozvolite nam da korak po korak pojasnimo situaciju. Naš tim prati utvrđene procedure koje su osmišljene da zaštite interese svih strana. Svaki korak ima svoju svrhu, čak i kada na prvi pogled to nije očigledno.\n\nAko postoji nešto što i dalje nije jasno, molimo Vas slobodno da pitate — razgovor je uvek dobrodošao.\n\nS poštovanjem",
+    ],
+  },
+
+  eskalacija: {
+    formalno: [
+      "Poštovani,\n\nHvala na Vašem obraćanju. S obzirom na prirodu Vašeg zahteva, isti ćemo proslediti odgovornoj osobi u našem timu koja je u nadležnosti za ovu oblast.\n\nOčekujte kontakt od strane kolege u najkraćem mogućem roku. Cenimo Vaše strpljenje.\n\nS poštovanjem",
+      "Poštovani,\n\nVaš zahtev zahteva posebnu pažnju i stručnost koja prevazilazi okvir standardne podrške. Iz tog razloga, predmet prosleđujemo nadležnom timu koji će Vam pružiti odgovarajuću podršku.\n\nBićete kontaktirani uskoro.\n\nS poštovanjem",
+    ],
+    prijatno: [
+      "Zdravo!\n\nHvala što ste nam se javili sa ovim — zaslužujete pravi odgovor od nekoga ko se specifično bavi ovim. Upravo zbog toga ćemo Vaš zahtev proslediti kolegi koji će moći da Vam pruži potpunu podršku.\n\nJavićemo Vam se uskoro!\n\nSrdačan pozdrav",
+    ],
+    kratko: [
+      "Poštovani,\n\nZahtev prosleđujemo nadležnoj osobi u timu. Kontaktiraće Vas u najkraćem roku.\n\nPozdrav",
+    ],
+    strpljivo: [
+      "Poštovani,\n\nHvala Vam na strpljenju i detaljnom opisu situacije. Vaš zahtev je specifičan i zaslužuje pažnju stručnjaka koji je u potpunosti upoznat sa ovom oblašću.\n\nPrenosimo Vaš predmet odgovornom kolegi koji će Vas kontaktirati i posvetiti punu pažnju Vašem slučaju. Shvatamo da ste već čekali i cenimo to razumevanje.\n\nS poštovanjem",
+    ],
+  },
+
+  zahvalnost: {
+    formalno: [
+      "Poštovani,\n\nZahvaljujemo Vam na strpljenju i razumevanju koje ste iskazali tokom naše saradnje. Vaša kooperativnost je dragocena i omogućava nam da pružimo kvalitetniju uslugu.\n\nCenimo Vaše poverenje i nastavljamo sa predanim radom na ispunjenju Vaših potreba.\n\nS poštovanjem",
+      "Poštovani,\n\nIskreno Vam zahvaljujemo na razumevanju koje ste pokazali. Svesni smo da situacija nije uvek idealna, i Vaša tolerancija i profesionalnost nam zaista znače.\n\nNastavljamo da radimo na tome da Vaše iskustvo bude što bolje.\n\nS poštovanjem",
+    ],
+    prijatno: [
+      "Zdravo!\n\nŽeleli smo samo da Vam zahvalimo — Vaše strpljenje i razumevanje su nam zaista puno značili. Nije uvek lako čekati, i cenimu to što ste uz nas uprkos tome.\n\nRadujemo se nastavku saradnje!\n\nSrdačan pozdrav",
+    ],
+    kratko: [
+      "Poštovani,\n\nHvala na strpljenju i razumevanju. Cenimo Vaš profesionalni pristup i nastavljamo da radimo na ispunjenju Vaših potreba.\n\nPozdrav",
+    ],
+    strpljivo: [
+      "Poštovani,\n\nŽeleli smo da odvojimo trenutak i iskreno Vam zahvalimo na izuzetnom strpljenju koje ste pokazali. Razumemo da čekanje i nesigurnost mogu biti frustrirajući, i to cenimo utoliko više.\n\nVaše razumevanje nam daje snagu da nastavimo da radimo predano i sa fokusom na Vaše potrebe. Mnogo nam znači.\n\nS poštovanjem",
+    ],
+  },
+
+};
+
+// ─── GENERATOR ───────────────────────────────────────────────────────────────
+
+function generiši() {
+  const ulaz = document.getElementById('ulaz').value.trim();
+  if (!ulaz) {
+    alert('Molimo unesi svoju internu misao pre nego što generišeš poruku.');
+    return;
+  }
+
+  const pool = TEMPLATES[selectedType]?.[selectedTone] || TEMPLATES[selectedType]?.['formalno'];
+  if (!pool || pool.length === 0) return;
+
+  // Pick random from pool
+  const template = pool[Math.floor(Math.random() * pool.length)];
+
+  // Try to extract a detail keyword to personalize slightly
+  const ulazLower = ulaz.toLowerCase();
+  let kontekst = '';
+  if (ulazLower.includes('faktur')) kontekst = 'fakturi';
+  else if (ulazLower.includes('isporuč') || ulazLower.includes('dostav')) kontekst = 'isporuci';
+  else if (ulazLower.includes('ugovor')) kontekst = 'ugovoru';
+  else if (ulazLower.includes('plaćan') || ulazLower.includes('uplat')) kontekst = 'plaćanju';
+  else if (ulazLower.includes('tehničk') || ulazLower.includes('bug') || ulazLower.includes('greška')) kontekst = 'tehničkom problemu';
+  else if (ulazLower.includes('vraćan') || ulazLower.includes('reklamacij')) kontekst = 'reklamaciji';
+
+  let tekst = template;
+  if (kontekst) {
+    tekst = tekst.replace('Vašem zahtevu', `Vašem zahtevu vezanom za ${kontekst}`);
+    tekst = tekst.replace('Vašeg zahteva', `Vašeg zahteva vezanog za ${kontekst}`);
+  }
+
+  document.getElementById('result-body').textContent = tekst;
+  const card = document.getElementById('result-card');
+  card.style.display = 'block';
+  card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function kopiraj() {
+  const tekst = document.getElementById('result-body').textContent;
+  navigator.clipboard.writeText(tekst).then(() => {
+    const btn = document.getElementById('btn-copy');
+    btn.textContent = '✓ Kopirano';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '⎘ Kopiraj'; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = tekst;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    const btn = document.getElementById('btn-copy');
+    btn.textContent = '✓ Kopirano';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '⎘ Kopiraj'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+</script>
+</body>
+</html>
